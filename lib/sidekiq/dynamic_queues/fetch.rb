@@ -17,12 +17,12 @@ module Sidekiq
       end
 
       # overriding Sidekiq::BasicFetch#queues_cmd
+      # Note: strictly ordered not supported.
       def queues_cmd
         if @dynamic_queues.grep(/(^!)|(^@)|(\*)/).size == 0
           super
         else
-          queues = expand_queues(@dynamic_queues)
-          queues = @strictly_ordered_queues ? queues : queues.shuffle
+          queues = expand_queues(@dynamic_queues).shuffle
           queues << Sidekiq::BasicFetch::TIMEOUT
         end
       end
