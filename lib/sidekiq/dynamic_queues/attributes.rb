@@ -73,7 +73,14 @@ module Sidekiq
       # list for a key with
       # Sidekiq::DynamicQueues::Attributes.set_dynamic_queue(key, ["q1", "q2"]
       #
+      # Priorities can be set by repeating wildcards, eg paid_*, paid_*, free_*
+      #
+      # Adding a slash at end will repeat the queue, eg paid_*/10
       def expand_queues(queues)
+        expand_queue_names(queues).map{|q| "queue:#{q}"}
+      end
+      
+      def expand_queue_names(queues)
         queue_names = queues.dup
 
         real_queues = Sidekiq::Queue.all.map(&:name)
@@ -81,6 +88,13 @@ module Sidekiq
 
         while q = queue_names.shift
           q = q.to_s
+
+          if q =~ /\A(.+)\/([0-9]+)\Z/
+            $2.to_i.times do
+              queue_names << $1
+            end
+            next
+          end
 
           if q =~ /^(!)?@(.*)/
             key = $2.strip
@@ -93,10 +107,8 @@ module Sidekiq
             next
           end
 
-          if q =~ /^!/
-            negated = true
-            q = q[1..-1]
-          end
+          negated = q =~ /^!/
+          q = q[1..-1] if negated
 
           patstr = q.gsub(/\*/, ".*")
           pattern = /^#{patstr}$/
@@ -109,7 +121,24 @@ module Sidekiq
           end
         end
 
-        return matched_queues.collect { |q| "queue:#{q}" }.uniq
+        return matched_queues.sort
+      end
+
+      def expand_queues_for_display(queues)
+        expanded = []
+        last_queue = nil
+        n = 1
+        expand_queue_names(queues).sort.each do |queue|
+          if queue == last_queue
+            n += 1
+            expanded[-1] = "#{queue}/#{n}"
+          else
+            expanded << queue
+            last_queue = queue
+            n = 1
+          end          
+        end
+        expanded
       end
 
     end

@@ -22,8 +22,7 @@ module Sidekiq
           @queues = []
           dqueues = Attr.get_dynamic_queues
           dqueues.each do |k, v|
-            expanded = Attr.expand_queues(["@#{k}"])
-            expanded = expanded.collect {|q| q.split(":").last }
+            expanded = Attr.expand_queues_for_display(["@#{k}"])
             view_data = {
                 'name' => k,
                 'value' => Array(v).join(", "),
