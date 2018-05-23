@@ -36,14 +36,14 @@
           <%= data['expanded'] %>
         </td>
         <td>
-          <a href="#remove" class="remove">Remove</a>
+          <a href="#remove" class="remove btn btn-danger btn-xs">Remove</a>
         </td>
       </tr>
     <% end %>
   </table>
-  <a href="#add" class="add">Add</a>
+  <a href="#add" class="add btn btn-warn">Add</a>
 
-  <input type="submit" value="Save" />
+  <input type="submit" class="btn btn-danger" value="Save" />
 </form>
 
 <script type="text/javascript">
@@ -51,11 +51,11 @@
   {
     $("input[type=submit]").css({border:"3px orange solid"});
   }
-  
+
   jQuery(function($) {
 
     $("input").live("keypress", markDirty);
-    
+
     $("a.add").live("click", function(e) {
       e.preventDefault();
       var $table = $("table.queues");
@@ -73,6 +73,6 @@
       markDirty();
     });
 
- 
+
   });
 </script>

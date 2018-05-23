@@ -48,7 +48,7 @@ module Sidekiq
           redirect "#{root_path}dynamicqueue"
         end
 
-        app.tabs["Dynamic Queues"] = "dynamicqueue"
+        app.tabs["DynamicQueues"] = "dynamicqueue"
       end
     end
 
