@@ -7,17 +7,6 @@ module Sidekiq
       Attr = Sidekiq::DynamicQueues::Attributes
 
       def self.registered(app)
-        
-        app.helpers do
-          
-          def find_template(view,*a,&b)
-            dir = File.expand_path("../server/views/", __FILE__)
-            super(dir,*a,&b)
-            super
-          end
-          
-        end
-        
         app.get "/dynamicqueue" do
           @queues = []
           dqueues = Attr.get_dynamic_queues
@@ -30,7 +19,7 @@ module Sidekiq
             }
             @queues << view_data
           end
-          
+
           @queues.sort! do |a, b|
             an = a['name']
             bn = b['name']
@@ -42,8 +31,9 @@ module Sidekiq
               an <=> bn
             end
           end
-          
-          erb :dynamicqueue
+
+          view_path = File.join(File.expand_path("..", __FILE__), "server", "views")
+          render(:erb, File.read(File.join(view_path, "dynamicqueue.erb")))
         end
 
         app.post "/dynamicqueue" do
@@ -58,9 +48,9 @@ module Sidekiq
           redirect "#{root_path}dynamicqueue"
         end
 
-        app.tabs["DynamicQueues"] = "dynamicqueue"
+        app.tabs["Dynamic Queues"] = "dynamicqueue"
       end
     end
-    
+
   end
 end
